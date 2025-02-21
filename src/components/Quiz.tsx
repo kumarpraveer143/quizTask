@@ -2,15 +2,24 @@ import { useState, useEffect } from "react";
 import data from "../assets/data";
 import GameOver from "../pages/GameOver";
 
-const Quiz = () => {
-  const [index, setIndex] = useState(0);
-  const [lock, setLock] = useState(false);
-  const [answer, setAnswer] = useState(true);
-  const [attempt, setAttempt] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(30);
-  const [correctFirstTry, setCorrectFirstTry] = useState(0);
+interface Question {
+  question: string;
+  option1: string;
+  option2: string;
+  option3: string;
+  option4: string;
+  answer: number;
+}
 
-  const question = data[index];
+const Quiz: React.FC = () => {
+  const [index, setIndex] = useState<number>(0);
+  const [lock, setLock] = useState<boolean>(false);
+  const [answer, setAnswer] = useState<boolean>(true);
+  const [attempt, setAttempt] = useState<number>(0);
+  const [timeLeft, setTimeLeft] = useState<number>(30);
+  const [correctFirstTry, setCorrectFirstTry] = useState<number>(0);
+
+  const question: Question = data[index];
 
   useEffect(() => {
     if (timeLeft === 0) {
@@ -35,7 +44,7 @@ const Quiz = () => {
 
   const next = () => {
     if (lock || timeLeft === 0) {
-      document.querySelectorAll("li").forEach((li) => {
+      document.querySelectorAll<HTMLLIElement>("li").forEach((li) => {
         li.classList.remove("bg-green-500", "bg-red-900");
         li.style.textDecoration = "none";
       });
@@ -46,11 +55,11 @@ const Quiz = () => {
     }
   };
 
-  const checkAns = (e, ans) => {
+  const checkAns = (e: React.MouseEvent<HTMLLIElement>, ans: number) => {
     if (!lock) {
       setAttempt((prev) => prev + 1);
       if (question.answer === ans) {
-        e.target.classList.add("bg-green-500");
+        (e.target as HTMLLIElement).classList.add("bg-green-500");
         setAnswer(true);
         setLock(true);
         setTimeLeft(-1); // Stop timer
@@ -58,8 +67,8 @@ const Quiz = () => {
           setCorrectFirstTry((prev) => prev + 1);
         }
       } else {
-        e.target.style.textDecoration = "line-through";
-        e.target.classList.add("bg-red-900");
+        (e.target as HTMLLIElement).style.textDecoration = "line-through";
+        (e.target as HTMLLIElement).classList.add("bg-red-900");
         setAnswer(false);
         setLock(true);
       }
@@ -69,7 +78,7 @@ const Quiz = () => {
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white p-4">
       <div className="text-2xl font-semibold text-center mb-6">
-        {index + 1}. {question.question}
+        {index + 1}. {question?.question}
       </div>
       <div className="text-xl font-bold text-red-400 mb-4">
         Time Left: {timeLeft > 0 ? timeLeft : 0}s
@@ -81,7 +90,7 @@ const Quiz = () => {
             onClick={(e) => checkAns(e, opt)}
             className="p-4 bg-gray-800 rounded-lg cursor-pointer hover:bg-blue-600 transition"
           >
-            {question[`option${opt}`]}
+            {question?.[`option${opt}` as keyof Question]}
           </li>
         ))}
       </ul>
